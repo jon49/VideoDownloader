@@ -96,8 +96,8 @@ var cleanUrl = (url: string) : [URLSearchParams | undefined, string] => {
 }
 
 const run = async (req: ServerRequest) => {
-    console.log(req.method, req.url)
     const [search, url] = cleanUrl(req.url)
+    console.log(req.method, url)
     var contentType
     var data
 
@@ -125,9 +125,15 @@ const run = async (req: ServerRequest) => {
         data
     }
 
-    // const debug = (x: RouteInternal) => console.log(x.method, x.method === req.method, x.route, x.route?.test(url), x.guard, x.guard && x.guard(request))
+    // const debug = (x: RouteInternal) =>
+    //     console.log(
+    //         "  Method:", x.method, x.method === req.method,
+    //         "\n  Route:", x.route, x.route?.test(url),
+    //         "\n  Guard:", x.guard, x.guard && x.guard(request),
+    //         "\n  Exec:", url, x.route?.exec(url))
+
     const route = routeList.find(
-        x => (
+        x => (//debug(x),
             x.method === req.method
         && (x.route?.test(url) ?? true)
         && (x.guard ? x.guard(request) : true)))

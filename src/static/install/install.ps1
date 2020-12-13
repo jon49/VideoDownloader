@@ -1,3 +1,5 @@
+param([string] $FfmpegUrl, [string] $YtUrl, [string] $UUID)
+
 $VideoDownloaderDir = "~/.video-downloader"
 $VideoDownloaderBinDir = "$VideoDownloaderDir/bin"
 
@@ -37,23 +39,19 @@ function Add-Path {
 
 Add-Path -PathToAdd "$VideoDownloaderBinDir" -UserType "User" -PathType "Path"
 
-if (!(Test-Path -Path "~/.deno/bin/deno.exe")) {
-    Invoke-WebRequest https://deno.land/x/install/install.ps1 -UseBasicParsing | Invoke-Expression
+$YoutubePath = "$VideoDownloaderBinDir/youtube-dl.exe"
+if (!(Test-Path -Path $YoutubePath) -and $YtUrl.Length -gt 0) {
+    Invoke-WebRequest $YtUrl -UseBasicParsing -OutFile $YoutubePath
 }
 
-
-$YoutubePath = "$VideoDownloaderBinDir/youtube-dl.exe"
-if (!(Test-Path -Path $YoutubePath)) {
-    Invoke-WebRequest "https://yt-dl.org/downloads/2020.12.05/youtube-dl.exe" -UseBasicParsing -OutFile $YoutubePath
-    explorer.exe "https://www.microsoft.com/en-US/download/details.aspx?id=5555"
-    Read-Host "Please download and install 'Microsoft Visual C++ 2010 Redistributable Package (x86)' and press enter to continue."
-
-    if (Test-Command -Command 7z){
-        Invoke-WebRequest "https://www.7-zip.org/a/7z1900-x64.msi" -UseBasicParsing | Invoke-Expression
-    }
-    Invoke-WebRequest "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z" -UseBasicParsing -OutFile ./temp.7z
-    7z e -o"./temp" -r ./temp.7z bin
-    Remove-Item ./temp/bin
-    Move-Item ./temp/* "$VideoDownloaderBinDir"
-    Remove-Item ./temp
+$FfmpegPath = "$VideoDownloaderBinDir/ffmpeg.exe"
+$tempFfmpegPath = Join-Path $Env:Temp $UUID
+$ffmpegTempFilename = Join-Path $tempFfmpegPath "ffmpeg.zip"
+if (!(Test-Path -Path $FfmpegPath) -and $FfmpegUrl.Length -gt 0) {
+    New-Item -Type Directory -ErrorAction SilentlyContinue -Path $tempFfmpegPath > $null
+    Invoke-WebRequest $FfmpegUrl -UseBasicParsing -OutFile $ffmpegTempFilename
+    Write-Host $ffmpegTempFilename
+    Expand-Archive -Force $ffmpegTempFilename $tempFfmpegPath
+    $ffmpegBinDir = Get-ChildItem $tempFfmpegPath -Directory -Recurse | ?{ $_.Name -eq "bin" } | Select-Object FullName
+    Move-Item "$($ffmpegBinDir.FullName)/*" $VideoDownloaderBinDir
 }

@@ -31,3 +31,10 @@ export const toJson = (req: ServerRequest, data: any) => {
         headers: jsonHeaders
     })
 }
+
+export const redirect = (req: ServerRequest, url: string) => {
+    var headers = new Headers({
+        "Location": url
+    })
+    return req.respond({ headers, status: 302 })
+}
