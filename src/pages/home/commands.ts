@@ -1,5 +1,4 @@
-import { dlPath, setData } from "../../settings.ts"
-import { HomeModel } from "./index.html.ts"
+import { dlPath, setData, HomeModel } from "../../settings.ts"
 
 var decoder = new TextDecoder()
 export const getVideoName = async (url: string | null | undefined) => {

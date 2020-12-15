@@ -1,13 +1,6 @@
-import { getData } from "../../settings.ts"
+import { getData, HomeModel } from "../../settings.ts"
 import html, { HTMLRunnerSub } from "../../util/html.ts"
 import layout from "../shared/layout.html.ts"
-
-export interface HomeModel {
-    errors: string[] | undefined | null
-    format: "lqytmp3" | "hqytmp3" | "hqyt" | undefined
-    urls: (string | undefined | null)[]
-    targetDirectory: string | undefined
-}
 
 const errorView = (err: HTMLRunnerSub) => html`<p>${err}</p>`
 const downloadFormId = "download"
@@ -16,7 +9,7 @@ const checked = (b: boolean) => b ? "checked" : ""
 export default async (data?: HomeModel) => {
 
 const videosAreDownloadingMessage = !!data
-const m = data ?? await getData<HomeModel>()
+const m = data ?? await getData()
 
 return layout({
     title: "Download Videos",
